@@ -690,5 +690,84 @@
                 </div>
             </div>
         </div>
+        </div>
+
+    <!-- Not logged in message -->
+    <div id="notLoggedInMessage" class="login-message">
+        <i class="fas fa-lock" style="font-size:3rem; color:#3b82f6;"></i>
+        <h2>Please Sign In or Sign Up</h2>
+        <p>You need to login to access the top-up centre and place orders.</p>
+        <button class="btn-outline" id="gotoLoginBtn" style="margin-top:1rem;">Sign In</button>
+        <button class="btn-outline" id="gotoSignupBtn" style="margin-top:1rem; margin-left:12px;">Sign Up</button>
     </div>
+
+    <!-- Thank You Modal -->
+    <div id="thankyouModal" class="modal-thankyou">
+        <div class="thankyou-content">
+            <i class="fas fa-check-circle"></i>
+            <h2>Thank You! 🎉</h2>
+            <p>Your order has been placed successfully.<br>Admin will verify the payment screenshot and top-up your Free Fire account shortly.<br><br>You can track the status in "My Orders".</p>
+            <button class="thankyou-close" id="closeThankYouBtn">Continue Shopping</button>
+        </div>
+    </div>
+
+    <!-- Admin Panel (hidden initially) -->
+    <div id="adminPanel" style="display:none;" class="card">
+        <div class="card-title"><i class="fas fa-user-shield"></i> Admin Dashboard <span class="admin-badge">Administrator</span></div>
+        <div style="margin-bottom:20px;">
+            <button id="backToUserBtn" class="btn-outline">← Back to User View</button>
+            <button id="adminLogoutBtn" class="btn-outline" style="margin-left:10px;">Admin Logout</button>
+        </div>
+        <div id="adminStats" style="background:#f1f5f9; padding:18px; border-radius:1.2rem; margin-bottom:25px; font-weight:500;"></div>
+        <div style="overflow-x:auto;">
+            <table class="orders-table" id="adminOrdersTable">
+                <thead><tr><th>Customer</th><th>Email</th><th>Order ID</th><th>Item</th><th>Amount</th><th>Date & Time</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="adminOrdersList"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>© 2025 Aaditya Top Up Centre | eSewa | WhatsApp +977 9703078638</footer>
+</div>
+
+<!-- Auth Modals -->
+<div id="loginModal" class="modal"><div class="modal-content"><h3>Sign In</h3><input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Password"><div class="modal-buttons"><button id="doLoginBtn" class="btn-outline">Login</button><button id="closeLoginModal" class="btn-outline">Cancel</button></div></div></div>
+<div id="signupModal" class="modal"><div class="modal-content"><h3>Sign Up</h3><input type="text" id="signupName" placeholder="Full Name"><input type="email" id="signupEmail" placeholder="Email"><input type="password" id="signupPassword" placeholder="Password"><div class="modal-buttons"><button id="doSignupBtn" class="btn-outline">Register</button><button id="closeSignupModal" class="btn-outline">Cancel</button></div></div></div>
+
+<iframe name="hiddenFrame" style="display:none"></iframe>
+
+<script>
+    // ---------- DATA ----------
+    const diamondPacks = [
+        { diamonds: 115, price: 120 }, { diamonds: 240, price: 220 }, { diamonds: 355, price: 340 },
+        { diamonds: 480, price: 440 }, { diamonds: 610, price: 560 }, { diamonds: 725, price: 650 },
+        { diamonds: 850, price: 760 }, { diamonds: 965, price: 880 }, { diamonds: 1090, price: 970 },
+        { diamonds: 1240, price: 1080 }, { diamonds: 1355, price: 1200 }, { diamonds: 1480, price: 1300 },
+        { diamonds: 1720, price: 1600 }, { diamonds: 2090, price: 1800 }, { diamonds: 2530, price: 2200 }
+    ];
+    const membershipOffers = [
+        { name: "🎁 Weekly Membership", price: 220, desc: "7 days" },
+        { name: "🎖️ Monthly Membership", price: 1100, desc: "30 days" },
+        { name: "🔥 Weekly+Monthly Combo", price: 1180, desc: "Best value" }
+    ];
+
+    let currentSelection = null;
+    let selectedFile = null;
+    let currentUser = null;
+    let isAdminMode = false;
+
+    const ADMIN_EMAIL = "admin@aaditya.com";
+    const ADMIN_PASSWORD = "admin123";
+
+    // ---------- AUTH & STORAGE ----------
+    function loadUsers() { return JSON.parse(localStorage.getItem('topup_users') || '[]'); }
+    function saveUsers(users) { localStorage.setItem('topup_users', JSON.stringify(users)); }
+    function getCurrentUser() { return JSON.parse(sessionStorage.getItem('topup_currentUser')); }
+    function setCurrentUser(user) { sessionStorage.setItem('topup_currentUser', JSON.stringify(user)); currentUser = user; }
+    function clearCurrentUser() { sessionStorage.removeItem('topup_currentUser'); currentUser = null; }
+
+    // Panel switching with refresh
+    function switchPanel(panelId) {
+        document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active-panel'));
+        document.getElementById(`panel-${panelId}`).classList.add('active-panel');
     
