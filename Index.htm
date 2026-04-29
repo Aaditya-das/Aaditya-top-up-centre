@@ -1023,4 +1023,55 @@
                 dotsIcon.classList.remove('active'); // close menu after selection
             });
         });
-    }
+     }
+
+    // Auth handlers
+    function closeModals() { document.getElementById('loginModal').style.display = 'none'; document.getElementById('signupModal').style.display = 'none'; }
+    document.getElementById('loginBtn')?.addEventListener('click', () => document.getElementById('loginModal').style.display = 'flex');
+    document.getElementById('signupBtn')?.addEventListener('click', () => document.getElementById('signupModal').style.display = 'flex');
+    document.getElementById('gotoLoginBtn')?.addEventListener('click', () => document.getElementById('loginModal').style.display = 'flex');
+    document.getElementById('gotoSignupBtn')?.addEventListener('click', () => document.getElementById('signupModal').style.display = 'flex');
+    document.getElementById('closeLoginModal')?.addEventListener('click', closeModals);
+    document.getElementById('closeSignupModal')?.addEventListener('click', closeModals);
+    document.getElementById('doLoginBtn')?.addEventListener('click', () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const pwd = document.getElementById('loginPassword').value.trim();
+        if (email === ADMIN_EMAIL && pwd === ADMIN_PASSWORD) {
+            setCurrentUser({ email: ADMIN_EMAIL, name: "Admin", isAdmin: true });
+            isAdminMode = true;
+            updateUIForAuth();
+            closeModals();
+            showToast("Admin logged in", false);
+            return;
+        }
+        const users = loadUsers();
+        const found = users.find(u => u.email === email && u.password === pwd);
+        if (found) { setCurrentUser({ email: found.email, name: found.name, orders: found.orders || [] }); isAdminMode = false; updateUIForAuth(); closeModals(); showToast(`Welcome ${found.name}`, false); }
+        else showToast("Invalid credentials", true);
+    });
+    document.getElementById('doSignupBtn')?.addEventListener('click', () => {
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const pwd = document.getElementById('signupPassword').value.trim();
+        if (!name || !email || !pwd) { showToast("All fields required", true); return; }
+        let users = loadUsers();
+        if (users.find(u => u.email === email)) { showToast("Email exists", true); return; }
+        const newUser = { email, name, password: pwd, orders: [] };
+        users.push(newUser);
+        saveUsers(users);
+        setCurrentUser({ email, name, orders: [] });
+        isAdminMode = false;
+        updateUIForAuth();
+        closeModals();
+        showToast("Account created! Welcome", false);
+    });
+    document.getElementById('logoutBtn')?.addEventListener('click', () => { clearCurrentUser(); isAdminMode = false; updateUIForAuth(); showToast("Logged out", false); });
+    document.getElementById('backToUserBtn')?.addEventListener('click', () => { isAdminMode = false; updateUIForAuth(); });
+    document.getElementById('adminLogoutBtn')?.addEventListener('click', () => { clearCurrentUser(); isAdminMode = false; updateUIForAuth(); showToast("Admin logged out", false); });
+
+    function showToast(msg, err) { const t = document.createElement('div'); t.className = 'toast-msg'; t.innerText = msg; t.style.backgroundColor = err ? '#fee2e2' : '#e6f7e6'; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+    
+    updateUIForAuth();
+</script>
+</body/>
+</html>
