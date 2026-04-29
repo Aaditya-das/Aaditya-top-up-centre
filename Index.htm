@@ -624,10 +624,71 @@
                     <div class="membership-area">
                         <div class="card-title" style="font-size:1.6rem;"><i class="fas fa-trophy"></i> MEMBERSHIP & PASSES</div>
                         <div class="membership-options" id="membershipOptions"></div>
-                    </div>
-                    <div class="esewa-note" style="margin-top:1.2rem; text-align:center;">💰 All prices in INR</div>
+                        
+                        <div class="esewa-note" style="margin-top:1.2rem; text-align:center;">💰 All prices in INR</div>
                 </div>
 
                 <div class="card info-panel">
                     <div class="card-title"><i class="fas fa-shopping-cart"></i> PLACE YOUR ORDER</div>
-                    <div class="input-group"><label><i class="fas fa
+                    <div class="input-group"><label><i class="fas fa-user"></i> Full Name</label><input type="text" id="fullName" placeholder="Full name" autocomplete="off"></div>
+                    <div class="input-group"><label><i class="fas fa-gamepad"></i> Game Name</label><input type="text" id="gameName" value="Free Fire" readonly style="background:#eef2ff;"></div>
+                    <div class="input-group"><label><i class="fas fa-id-card"></i> Free Fire UID</label><input type="text" id="uid" placeholder="Enter UID (numbers only)"></div>
+
+                    <div class="selected-display" id="selectedDisplay">
+                        <p><i class="fas fa-info-circle"></i> <strong>No item selected</strong></p>
+                        <p>📦 Item: <span id="selectedItemName">—</span></p>
+                        <p>💰 Amount: <span class="highlight-price" id="selectedPrice">₹0</span></p>
+                    </div>
+
+                    <div class="qr-wrapper">
+                        <div><i class="fas fa-mobile-alt"></i> eSewa™ Rekha Devi Das | 9703078638</div>
+                        <div id="qrcode"></div>
+                        <p>📸 Scan QR & pay exact amount</p>
+                        <p class="esewa-note">✅ After payment, upload screenshot</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label><i class="fas fa-image"></i> Payment Screenshot</label>
+                        <div class="file-upload-area" id="fileUploadArea"><i class="fas fa-cloud-upload-alt"></i> Click to select screenshot<br><small>JPG/PNG, max 5MB</small><input type="file" id="screenshot" accept="image/*"><div id="fileName" class="file-name">No file chosen</div></div>
+                    </div>
+                    <button class="btn-order" id="submitOrderBtn" disabled><i class="fas fa-paper-plane"></i> CONFIRM & PLACE ORDER</button>
+                    <div style="text-align:center; margin-top:15px;"><a href="https://wa.me/9779703078638" target="_blank" style="background:#25D366; color:white; padding:8px 20px; border-radius:40px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">Need Help? WhatsApp</a></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel: My Orders - Full history with Date/Time -->
+        <div id="panel-orders" class="panel">
+            <div class="orders-section">
+                <div class="card-title"><i class="fas fa-history"></i> My Order History (All transactions)</div>
+                <div style="overflow-x: auto;">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Item</th>
+                                <th>Amount</th>
+                                <th>Date & Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersList"></tbody>
+                    </table>
+                </div>
+                <p style="font-size:0.85rem; margin-top:12px;">* Complete history — all orders ever placed. Status updates after admin verification.</p>
+            </div>
+        </div>
+
+        <!-- Panel: Account Information -->
+        <div id="panel-account" class="panel">
+            <div class="account-info">
+                <div class="card-title"><i class="fas fa-user-circle"></i> Account Information</div>
+                <div class="account-details">
+                    <p><strong>👤 Name:</strong> <span id="accName"></span></p>
+                    <p><strong>📧 Email:</strong> <span id="accEmail"></span></p>
+                    <p><strong>🆔 User ID:</strong> <span id="accUserId"></span></p>
+                    <p><strong>📅 Member Since:</strong> <span id="accSince"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
