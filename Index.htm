@@ -770,4 +770,123 @@
     function switchPanel(panelId) {
         document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active-panel'));
         document.getElementById(`panel-${panelId}`).classList.add('active-panel');
-    
+        
+        if (panelId === 'orders') {
+            renderOrders();  // refresh order history
+        } else if (panelId === 'account') {
+            updateAccountInfo();
+        } else if (panelId === 'topup') {
+            renderDiamondGrid();
+            renderMembershipOptions();
+            updateUIAndQR();
+            updateOrderButton();
+        }
+    }
+
+    function updateAccountInfo() {
+        const user = getCurrentUser();
+        if (user) {
+            document.getElementById('accName').innerText = user.name || '—';
+            document.getElementById('accEmail').innerText = user.email;
+            document.getElementById('accUserId').innerText = user.email.split('@')[0];
+            let since = localStorage.getItem(`user_since_${user.email}`);
+            if (!since) {
+                since = new Date().toLocaleDateString();
+                localStorage.setItem(`user_since_${user.email}`, since);
+            }
+            document.getElementById('accSince').innerText = since;
+        }
+    }
+
+    function updateUIForAuth() {
+        const user = getCurrentUser();
+        const protectedDiv = document.getElementById('protectedContent');
+        const notLoggedDiv = document.getElementById('notLoggedInMessage');
+        const authWidget = document.getElementById('authWidget');
+        const userInfoDiv = document.getElementById('userInfo');
+        const userNameSpan = document.getElementById('userName');
+        const dotsMenu = document.getElementById('topRightDots');
+
+        if (user && !isAdminMode) {
+            protectedDiv.style.display = 'block';
+            notLoggedDiv.style.display = 'none';
+            authWidget.style.display = 'none';
+            userInfoDiv.style.display = 'flex';
+            userNameSpan.innerText = user.name || user.email;
+            dotsMenu.style.display = 'flex';
+            switchPanel('topup');
+            renderOrders(); // load orders into memory
+            updateAccountInfo();
+            updateOrderButton();
+        } else if (user && isAdminMode) {
+            protectedDiv.style.display = 'none';
+            notLoggedDiv.style.display = 'none';
+            authWidget.style.display = 'none';
+            userInfoDiv.style.display = 'flex';
+            userNameSpan.innerText = "Admin";
+            dotsMenu.style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            renderAdminPanel();
+        } else {
+            protectedDiv.style.display = 'none';
+            notLoggedDiv.style.display = 'block';
+            authWidget.style.display = 'flex';
+            userInfoDiv.style.display = 'none';
+            dotsMenu.style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            isAdminMode = false;
+        }
+    }
+
+    function saveOrderForUser(email, orderObj) {
+        let users = loadUsers();
+        const userIndex = users.findIndex(u => u.email === email);
+        if (userIndex !== -1) {
+            if (!users[userIndex].orders) users[userIndex].orders = [];
+            users[userIndex].orders.unshift(orderObj);
+            saveUsers(users);
+            const sess = getCurrentUser();
+            if (sess && sess.email === email && !isAdminMode) {
+                sess.orders = users[userIndex].orders;
+                setCurrentUser(sess);
+                currentUser = sess;
+            }
+        }
+    }
+
+    // Full order history with date/time
+    function renderOrders() {
+        const user = getCurrentUser();
+        const tbody = document.getElementById('ordersList');
+        if (!user || !user.orders || user.orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No orders yet — place your first order!</td></tr>';
+            return;
+        }
+        tbody.innerHTML = '';
+        user.orders.forEach(order => {
+            const statusHTML = order.status === 'Completed' 
+                ? '<span class="status-complete"><i class="fas fa-check-circle"></i> Completed</span>'
+                : '<span class="status-pending"><i class="fas fa-clock"></i> Pending</span>';
+            tbody.innerHTML += `
+                <tr>
+                    <td style="text-align:center;">${statusHTML}</td>
+                    <td>${order.item}</td>
+                    <td>₹${order.amount}</td>
+                    <td>${order.dateTime}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // Admin functions (unchanged, uses full details)
+    function getAllOrders() {
+        const users = loadUsers();
+        let allOrders = [];
+        users.forEach(user => {
+            if (user.orders && user.orders.length) {
+                user.orders.forEach(order => {
+                    allOrders.push({ customerName: user.name, customerEmail: user.email, ...order });
+                });
+            }
+        });
+        return allOrders.sort((a,b) => new Date(b.dateTime) - new Date(a.dateTimecddrcdc 
